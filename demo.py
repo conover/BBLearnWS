@@ -6,20 +6,20 @@
 #
 # Written by Chris Conover on July 29, 2010
 
-# Requires Suds 0.4 Beta for plugin support
+# Requires Suds 0.4 for plugin support
 # https://fedorahosted.org/suds/
 from suds.client 	import Client
-from suds.plugin 	import Plugin
+from suds.plugin 	import MessagePlugin
 from suds.wsse  	import Timestamp, UsernameToken, Security
 
 # The base web service URL of your server
-WS_BASE_URL = '' # They call it https://your.institution.edu/webapps/ws/services/
+WS_BASE_URL = 'https://learndev.cms.ucf.edu/webapps/ws/services/' # They call it https://your.institution.edu/webapps/ws/services/
 
 # Suds does not provide the "type" attribute on the Password tag 
 # of the UsernameToken in the WS-Security SOAP headers. Create
 # a plugin which adds it at send time.
-class Learn9Plugin(Plugin):
-	def sending(self, context):
+class Learn9Plugin(MessagePlugin):
+	def marshalled(self, context):
 		password = context.envelope.childAtPath('Header/Security/UsernameToken/Password')
 		password.set('Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText')
 
