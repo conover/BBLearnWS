@@ -13,7 +13,7 @@ from suds.plugin 	import MessagePlugin
 from suds.wsse  	import Timestamp, UsernameToken, Security
 
 # The base web service URL of your server
-WS_BASE_URL = 'https://learndev.cms.ucf.edu/webapps/ws/services/' # They call it https://your.institution.edu/webapps/ws/services/
+WS_BASE_URL = 'https://learndev.cms.ucf.edu/webapps/ws/services/' # Something link https://your.institution.edu/webapps/ws/services/
 
 # Suds does not provide the "type" attribute on the Password tag 
 # of the UsernameToken in the WS-Security SOAP headers. Create
@@ -26,15 +26,17 @@ class Learn9Plugin(MessagePlugin):
 # WS-Security Headers. Timestamp token MUST come before UsernameToken
 security = Security()
 security.tokens.append(Timestamp())
+
 # Set initial WS-Security user ID and password.
 # Password will be updated with the result of the `initialize` operation.
 security.tokens.append(UsernameToken('session', 'nosession')) 
 
-client = Client(	WS_BASE_URL + 'Context.WS?wsdl',
-					location = WS_BASE_URL + 'Context.WS', # Learn 9.1 WSDL misreports service endpoints so set it manually
-					autoblend = True, # Learn 9.1 WSDLs use nested imports
-					wsse = security, # Add WS-Security tokens
-					plugins = [Learn9Plugin()]) # Add WS-Security/UsernameToken/Password Type fix
+client = Client(
+	WS_BASE_URL + 'Context.WS?wsdl',
+	location = WS_BASE_URL + 'Context.WS', # Learn 9.1 WSDL misreports service endpoints so set it manually
+	autoblend = True, # Learn 9.1 WSDLs use nested imports
+	wsse = security, # Add WS-Security tokens
+	plugins = [Learn9Plugin()]) # Add WS-Security/UsernameToken/Password Type fix
 
-session_password = client.service.initialize()
+session_password                       = client.service.initialize()
 client.options.wsse.tokens[1].password = session_password
